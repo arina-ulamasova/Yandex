@@ -1,8 +1,36 @@
-runtime: python
-python:
-  version: 3.9
+name: Deploy to GitHub Pages
 
-dependencies:
-  - flask
+on:
+  push:
+    branches:
+      - main  # замените на имя вашей основной ветки
 
-entrypoint: gunicorn -b :$PORT app:app
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'  # укажите версию Python, если она отличается
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt  # убедитесь, что у вас есть файл requirements.txt
+
+    - name: Build and deploy site
+      run: |
+        python app.py build
+        mkdir -p public
+        mv index.html about.html solutions.html gpt.html result.html public/
+      env:
+        FLASK_ENV: production
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
