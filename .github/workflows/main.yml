@@ -1,0 +1,8 @@
+runtime: python
+python:
+  version: 3.9
+
+dependencies:
+  - flask
+
+entrypoint: gunicorn -b :$PORT app:app
